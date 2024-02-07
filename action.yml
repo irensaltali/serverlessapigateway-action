@@ -1,0 +1,15 @@
+name: 'Deploy Serverless API Gateway'
+description: 'Deploy a Serverless API Gateway function with custom configuration'
+inputs:
+  configJson:
+    description: 'Path to the config.json file'
+    required: true
+  wranglerToml:
+    description: 'Path to the wrangler.toml file'
+    required: true
+  versionTag:
+    description: 'Version tag of the function to deploy'
+    required: true
+runs:
+  using: 'node20'
+  main: 'index.js'
