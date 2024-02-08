@@ -27,7 +27,7 @@ async function run() {
     const versionTag = core.getInput('versionTag', { required: true });
     const repoOwner = 'irensaltali';
     const repoName = 'serverlessapigateway';
-
+s
     // Initialize GitHub client
     const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
 
@@ -50,7 +50,7 @@ async function run() {
 
     // Prepare wrangler and config.json files
     await writeFile('./wrangler.toml', fs.readFileSync(wranglerPath));
-    await writeFile('./config.json', fs.readFileSync(configPath));
+    await writeFile('./src/api-config.json', fs.readFileSync(configPath));
 
     // Deploy using Wrangler
     // You might need to adjust the command depending on your exact deployment requirements
