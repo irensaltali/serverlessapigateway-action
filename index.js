@@ -3,7 +3,7 @@ const github = require('@actions/github');
 const exec = require('@actions/exec');
 const fs = require('fs');
 const fetch = require('node-fetch');
-const {promisify} = require('util');
+const { promisify } = require('util');
 const writeFile = promisify(fs.writeFile);
 
 async function downloadFile(url, path) {
@@ -27,6 +27,8 @@ async function run() {
     const versionTag = core.getInput('versionTag', { required: true });
     const repoOwner = 'irensaltali';
     const repoName = 'serverlessapigateway';
+    await exec.exec('npm install wrangler --save-dev');
+    await exec.exec('npx wrangler --version');
 
     // Initialize GitHub client
     console.log('Initializing GitHub client');
@@ -34,7 +36,7 @@ async function run() {
 
     // Fetch the release by tag
     console.log(`Fetching release ${versionTag}`);
-    const {data: release} = await octokit.rest.repos.getReleaseByTag({
+    const { data: release } = await octokit.rest.repos.getReleaseByTag({
       owner: repoOwner,
       repo: repoName,
       tag: versionTag
@@ -46,20 +48,35 @@ async function run() {
       throw new Error(`No assets found for release ${versionTag}`);
     }
 
-    // Download the asset
-    console.log(`Downloading asset ${asset.name}`);
-    const assetPath = `./temp-${asset.name}`;
-    await downloadFile(asset.browser_download_url, assetPath);
+    //Unzip the release and write
+    console.log(`Unzipping release ${versionTag}`);
+    const zipUrl = release.zipball_url;
+    const zipPath = `./temp-${versionTag}.zip`;
+    await downloadFile(zipUrl, zipPath);
+    await exec.exec(`unzip ${zipPath}`);
+    fs.unlinkSync(zipPath);
+    const zipDir = fs.readdirSync('.').find(f => f.startsWith('irensaltali-serverlessapigateway-'));
+    if (!zipDir) {
+      throw new Error(`No zip directory found for release ${versionTag}`);
+    }
+
+    // Move 'workers' directory to current directory
+    console.log(`Moving workers directory to current directory`);
+    fs.rename(`${zipDir}/worker`, './worker', (err) => {
+      if (err) {
+        return console.error(err);
+      }
+    });
 
     // Prepare wrangler and config.json files
     console.log('Preparing wrangler and config.json files');
-    await writeFile('./wrangler.toml', fs.readFileSync(wranglerPath));
-    await writeFile('./src/api-config.json', fs.readFileSync(configPath));
+    await writeFile('./worker/wrangler.toml', fs.readFileSync(wranglerPath));
+    await writeFile('./worker/src/api-config.json', fs.readFileSync(configPath));
 
     // Deploy using Wrangler
     // You might need to adjust the command depending on your exact deployment requirements
     console.log('Deploying to Cloudflare Workers');
-    await exec.exec(`wrangler publish`);
+    await exec.exec(`cd worker && npx wrangler deploy --dry-run true`);
 
     // Clean up downloaded files if necessary
     fs.unlinkSync(assetPath);
