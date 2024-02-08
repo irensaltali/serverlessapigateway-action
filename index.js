@@ -76,7 +76,7 @@ async function run() {
     // Deploy using Wrangler
     // You might need to adjust the command depending on your exact deployment requirements
     console.log('Deploying to Cloudflare Workers');
-    await exec.exec(`cd worker && npx wrangler deploy --dry-run true`);
+    await exec.exec(`npx wrangler deploy --dry-run true --assets ./worker/`);
 
     // Clean up downloaded files if necessary
     fs.unlinkSync(assetPath);
