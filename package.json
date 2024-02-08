@@ -2,13 +2,7 @@
   "name": "serverlessapigateway-action",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
-  "directories": {
-    "test": "test"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "main": "index.js",
   "author": "Iren Saltali @irensaltali",
   "type": "module",
   "dependencies": {
