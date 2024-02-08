@@ -25,13 +25,15 @@ async function run() {
     const configPath = core.getInput('configJson', { required: true });
     const wranglerPath = core.getInput('wranglerToml', { required: true });
     const versionTag = core.getInput('versionTag', { required: true });
-    const repoOwner = 'other-repo-owner';
-    const repoName = 'other-repo-name';
+    const repoOwner = 'irensaltali';
+    const repoName = 'serverlessapigateway';
 
     // Initialize GitHub client
+    console.log('Initializing GitHub client');
     const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
 
     // Fetch the release by tag
+    console.log(`Fetching release ${versionTag}`);
     const {data: release} = await octokit.rest.repos.getReleaseByTag({
       owner: repoOwner,
       repo: repoName,
@@ -45,16 +47,19 @@ async function run() {
     }
 
     // Download the asset
+    console.log(`Downloading asset ${asset.name}`);
     const assetPath = `./temp-${asset.name}`;
     await downloadFile(asset.browser_download_url, assetPath);
 
     // Prepare wrangler and config.json files
+    console.log('Preparing wrangler and config.json files');
     await writeFile('./wrangler.toml', fs.readFileSync(wranglerPath));
-    await writeFile('./config.json', fs.readFileSync(configPath));
+    await writeFile('./src/api-config.json', fs.readFileSync(configPath));
 
     // Deploy using Wrangler
     // You might need to adjust the command depending on your exact deployment requirements
-    await exec.exec(`wrangler publish --env production`);
+    console.log('Deploying to Cloudflare Workers');
+    await exec.exec(`wrangler publish`);
 
     // Clean up downloaded files if necessary
     fs.unlinkSync(assetPath);
