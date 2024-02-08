@@ -73,17 +73,9 @@ async function run() {
     await writeFile('./worker/wrangler.toml', fs.readFileSync(wranglerPath));
     await writeFile('./worker/src/api-config.json', fs.readFileSync(configPath));
 
-    // Deploy using Wrangler
-    // You might need to adjust the command depending on your exact deployment requirements
-    console.log('Deploying to Cloudflare Workers');
-    await exec.exec(`npx wrangler deploy --dry-run true --assets ./worker/`);
-
-    // Clean up downloaded files if necessary
-    fs.unlinkSync(assetPath);
-
-    console.log('Deployment successful!');
+    console.log('Worker ready for deployment');
   } catch (error) {
-    core.setFailed(`Deployment failed: ${error}`);
+    core.setFailed(`Action failed: ${error}`);
   }
 }
 
