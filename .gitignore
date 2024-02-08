@@ -1,6 +1,6 @@
-test/
 irensaltali-serverlessapigateway-*
 worker/
+test*
 # Logs
 
 logs
