@@ -1,4 +1,6 @@
 test/
+irensaltali-serverlessapigateway-*
+worker/
 # Logs
 
 logs
