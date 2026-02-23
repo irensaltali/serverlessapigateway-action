@@ -10,6 +10,12 @@ inputs:
   versionTag:
     description: 'Version tag of the function to deploy'
     required: true
+  repoOwner:
+    description: 'Repository owner of the serverlessapigateway release'
+    required: false
+  repoName:
+    description: 'Repository name of the serverlessapigateway release'
+    required: false
 runs:
   using: 'node20'
   main: 'index.js'
